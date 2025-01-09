@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rubrica Telefonica</title>
+    <style>
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+        }
+        h1 {
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            font-weight: bold;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            background-color: #810b64;
+            color: white;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #7d0fa8;
+        }
+        .contacts-list {
+            margin-top: 30px;
+            text-align: center;
+        }
+        .contacts-list select {
+            width: 60%;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Rubrica Telefonica</h1>
+
+        <div class="form-group">
+            <label for="nome">Nome:</label>
+            <input type="text" id="nome" placeholder="Inserisci nome">
+        </div>
+
+        <div class="form-group">
+            <label for="numero">Numero:</label>
+            <input type="text" id="numero" placeholder="Inserisci numero di telefono">
+        </div>
+
+        <div class="form-group">
+            <label for="indirizzo">Indirizzo:</label>
+            <input type="text" id="indirizzo" placeholder="Inserisci indirizzo">
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" placeholder="Inserisci email">
+        </div>
+
+        <button onclick="aggiungiContatto()">Aggiungi Contatto</button>
+
+        <div class="contacts-list">
+            <h3>Lista Contatti</h3>
+            <select id="selectContatti" onchange="selezionaContatto()">
+                <option value="">-- Seleziona un contatto --</option>
+            </select>
+            <br><br>
+
+            <button onclick="modificaContatto()">Modifica Contatto</button>
+            <button onclick="cancellaContatto()">Cancella Contatto</button>
+        </div>
+    </div>
+
+    <script>
+        // Classe Contatto
+        class Contatto {
+            constructor(nome, numero, indirizzo = '', email = '') {
+                this.nome = nome;
+                this.numero = numero;
+                this.indirizzo = indirizzo;
+                this.email = email;
+            }
+
+            // Restituisce una stringa con tutte le informazioni del contatto
+            toString() {
+                return `${this.nome} (${this.numero})`;
+            }
+        }
+
+        // Lista dei contatti
+        let contatti = [];
+
+        // Aggiungi un contatto alla lista
+        function aggiungiContatto() {
+            const nome = document.getElementById('nome').value;
+            const numero = document.getElementById('numero').value;
+            const indirizzo = document.getElementById('indirizzo').value;
+            const email = document.getElementById('email').value;
+
+            // Verifica che il nome e il numero siano stati inseriti
+            if (nome && numero) {
+                const contatto = new Contatto(nome, numero, indirizzo, email);
+                contatti.push(contatto);
+
+                // Pulisce i campi di input
+                document.getElementById('nome').value = '';
+                document.getElementById('numero').value = '';
+                document.getElementById('indirizzo').value = '';
+                document.getElementById('email').value = '';
+
+                // Rende disponibile il contatto nel select
+                aggiornaSelect();
+            } else {
+                alert('Nome e numero sono obbligatori!');
+            }
+        }
+
+        // Aggiorna il select con la lista dei contatti
+        function aggiornaSelect() {
+            const selectContatti = document.getElementById('selectContatti');
+            selectContatti.innerHTML = '<option value="">-- Seleziona un contatto --</option>'; // Reset select
+
+            contatti.forEach((contatto, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = contatto.toString();
+                selectContatti.appendChild(option);
+            });
+        }
+
+        // Seleziona un contatto dal select
+        function selezionaContatto() {
+            const selectContatti = document.getElementById('selectContatti');
+            const indice = selectContatti.value;
+            if (indice !== "") {
+                const contatto = contatti[indice];
+                document.getElementById('nome').value = contatto.nome;
+                document.getElementById('numero').value = contatto.numero;
+                document.getElementById('indirizzo').value = contatto.indirizzo;
+                document.getElementById('email').value = contatto.email;
+            }
+        }
+
+        // Modifica il contatto selezionato
+        function modificaContatto() {
+            const selectContatti = document.getElementById('selectContatti');
+            const indice = selectContatti.value;
+
+            if (indice !== "") {
+                const nome = document.getElementById('nome').value;
+                const numero = document.getElementById('numero').value;
+                const indirizzo = document.getElementById('indirizzo').value;
+                const email = document.getElementById('email').value;
+
+                if (nome && numero) {
+                    const contatto = contatti[indice];
+                    contatto.nome = nome;
+                    contatto.numero = numero;
+                    contatto.indirizzo = indirizzo;
+                    contatto.email = email;
+
+                    // Rende di nuovo disponibile il contatto aggiornato nel select
+                    aggiornaSelect();
+                    alert('Contatto modificato con successo!');
+                } else {
+                    alert('Nome e numero sono obbligatori!');
+                }
+            }
+        }
+
+        // Cancella il contatto selezionato
+        function cancellaContatto() {
+            const selectContatti = document.getElementById('selectContatti');
+            const indice = selectContatti.value;
+
+            if (indice !== "") {
+                contatti.splice(indice, 1);
+                aggiornaSelect();
+                alert('Contatto cancellato con successo!');
+            } else {
+                alert('Seleziona un contatto da cancellare.');
+            }
+        }
+    </script>
+
+</body>
+</html>
